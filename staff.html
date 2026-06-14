@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lokma · Staff</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{--coral:#FF6A52;--coral-deep:#E8472F;--cocoa:#3A2418;--cocoa-soft:#6B4B38;
+    --sunny:#FFC542;--cream:#FFF6EC;--pistachio:#7FB04B;--line:#E7D4C2;--white:#fff;}
+  *{box-sizing:border-box;} html,body{margin:0;}
+  body{font-family:'Nunito',system-ui,sans-serif;color:var(--cocoa);background:var(--cream);
+    min-height:100vh;display:flex;justify-content:center;padding:20px 16px 40px;-webkit-font-smoothing:antialiased;}
+  .wrap{width:100%;max-width:440px;}
+  .head{display:flex;align-items:center;gap:9px;margin:6px 2px 16px;}
+  .head .dot{width:13px;height:13px;border-radius:50%;background:var(--coral);}
+  .head h1{font-family:'Baloo 2';font-weight:800;font-size:19px;margin:0;}
+  .head .who{margin-left:auto;font-weight:800;font-size:11px;color:var(--cocoa-soft);}
+  .card{background:var(--white);border:2px solid var(--line);border-radius:20px;padding:20px;
+    box-shadow:0 14px 34px -18px rgba(58,36,24,.35);}
+  label{display:block;font-weight:800;font-size:12.5px;margin:0 0 5px 2px;}
+  input{width:100%;font-family:'Nunito';font-weight:700;font-size:17px;color:var(--cocoa);background:var(--cream);
+    border:2px solid var(--line);border-radius:13px;padding:13px 14px;outline:none;}
+  input:focus{border-color:var(--coral);background:#fff;box-shadow:0 0 0 4px rgba(255,106,82,.15);}
+  .big{text-align:center;letter-spacing:.35em;font-size:24px;}
+  button{font-family:'Baloo 2';font-weight:800;cursor:pointer;border:none;border-radius:13px;transition:transform .1s,background .15s,opacity .15s;}
+  button:active{transform:translateY(1px);}
+  .primary{width:100%;background:var(--cocoa);color:#fff;font-size:17px;padding:15px;margin-top:14px;}
+  .primary:hover{background:#2a1810;} .primary:disabled{opacity:.5;cursor:default;}
+  .alert{display:none;border-radius:11px;padding:10px 12px;font-weight:700;font-size:12.5px;margin-bottom:12px;}
+  .alert.err{display:block;background:#FFF2EF;border:2px solid #F6C3B8;color:var(--coral-deep);}
+  .alert.ok{display:block;background:#EEF7E3;border:2px solid #C5E0A3;color:#3c6314;}
+  .link{background:none;border:none;color:var(--coral-deep);font-family:'Nunito';font-weight:800;
+    font-size:12.5px;cursor:pointer;text-decoration:underline;padding:0;}
+  .hidden{display:none;}
+  /* member panel */
+  .mname{font-family:'Baloo 2';font-weight:800;font-size:23px;margin:2px 0 2px;}
+  .mphone{font-weight:700;font-size:13px;color:var(--cocoa-soft);margin:0 0 14px;}
+  .scoopflag{border-radius:12px;padding:11px;text-align:center;font-family:'Baloo 2';font-weight:800;font-size:14px;margin-bottom:14px;}
+  .scoopflag.ready{background:var(--sunny);color:#5a3d00;} .scoopflag.used{background:#EFE4D6;color:#8a6f57;}
+  .stamps{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;margin:0 0 6px;}
+  .stamp{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;}
+  .stamp.full{background:radial-gradient(circle at 35% 30%,#E89B4D,#B86A2A 78%);color:#fff;border:2px solid #A85C24;}
+  .stamp.empty{border:2px dashed #E6C7AD;background:#FFFCF8;}
+  .count{text-align:center;font-weight:800;font-size:14px;margin:6px 0 14px;}
+  .count b{color:var(--coral-deep);}
+  .ready-banner{display:none;background:var(--pistachio);color:#fff;border-radius:12px;padding:11px;text-align:center;
+    font-family:'Baloo 2';font-weight:800;font-size:15px;margin-bottom:12px;}
+  .ready-banner.show{display:block;}
+  .btnrow{display:flex;gap:10px;}
+  .add{flex:1;background:var(--coral);color:#fff;font-size:18px;padding:16px;}
+  .add:hover{background:var(--coral-deep);}
+  .redeem{flex:1;background:var(--pistachio);color:#fff;font-size:15px;padding:16px;}
+  .redeem:disabled{opacity:.4;cursor:default;}
+  .scoopbtn{width:100%;background:#fff;border:2px solid var(--line);color:var(--cocoa);font-size:13px;padding:12px;margin-top:10px;}
+  .scoopbtn:disabled{opacity:.4;cursor:default;}
+  .footrow{display:flex;justify-content:space-between;margin-top:16px;}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head"><span class="dot"></span><h1>Lokma · Staff</h1><span class="who" id="whoami"></span></div>
+
+    <!-- PIN gate -->
+    <div class="card" id="pinView">
+      <div class="alert" id="pinAlert"></div>
+      <label for="pin">Staff PIN</label>
+      <input id="pin" class="big" type="password" inputmode="numeric" maxlength="6" placeholder="••••" />
+      <button class="primary" onclick="checkPin()">Unlock</button>
+    </div>
+
+    <!-- staff sign-in (one time per device) -->
+    <div class="card hidden" id="authView">
+      <div class="alert" id="authAlert"></div>
+      <p style="font-weight:700;font-size:13px;color:var(--cocoa-soft);margin:0 0 14px;">
+        Sign this device in once with a manager's phone (must be on the staff allowlist).</p>
+      <div id="authPhoneStep">
+        <label for="sphone">Manager mobile</label>
+        <input id="sphone" type="tel" placeholder="514 555 0123" />
+        <button class="primary" id="sphoneBtn" onclick="staffSendCode()">Text code</button>
+      </div>
+      <div id="authOtpStep" class="hidden">
+        <label for="sotp">6-digit code</label>
+        <input id="sotp" class="big" type="text" inputmode="numeric" maxlength="6" placeholder="••••••" />
+        <button class="primary" onclick="staffVerify()">Verify device</button>
+      </div>
+    </div>
+
+    <!-- lookup + tools -->
+    <div class="card hidden" id="toolView">
+      <div class="alert" id="toolAlert"></div>
+      <label for="lookup">Customer mobile</label>
+      <input id="lookup" type="tel" placeholder="514 555 0123" />
+      <button class="primary" onclick="findMember()">Find card</button>
+
+      <div id="memberPanel" class="hidden" style="margin-top:18px;">
+        <p class="mname" id="mName"></p>
+        <p class="mphone" id="mPhone"></p>
+        <div class="scoopflag" id="mScoop"></div>
+        <div class="ready-banner" id="readyBanner">🎉 Free order ready — give the item, then tap Redeem</div>
+        <div class="stamps" id="mStamps"></div>
+        <p class="count" id="mCount"></p>
+        <div class="btnrow">
+          <button class="add" id="addBtn" onclick="addStamp()">+1 stamp</button>
+          <button class="redeem" id="redeemBtn" onclick="redeemOrder()">Redeem free order</button>
+        </div>
+        <button class="scoopbtn" id="scoopBtn" onclick="redeemScoop()">Redeem signup scoop 🍦</button>
+      </div>
+      <div class="footrow"><span></span><button class="link" onclick="signOut()">Sign out device</button></div>
+    </div>
+  </div>
+
+  <div id="recaptcha-container"></div>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+<script>
+const TOTAL=window.LOKMA.TOTAL_STAMPS;
+let auth,db,recaptcha,confirmationResult,current=null;
+
+function ready(){
+  if(!window.firebaseConfig||String(window.firebaseConfig.apiKey).startsWith("PASTE")){
+    show("pinAlert","err","⚙️ Add your Firebase keys in firebase-config.js first."); return false; }
+  if(!auth){ firebase.initializeApp(window.firebaseConfig); auth=firebase.auth(); db=firebase.firestore(); }
+  return true;
+}
+function show(id,kind,msg){const a=document.getElementById(id);a.className="alert "+kind;a.textContent=msg;}
+function hide(id){document.getElementById(id).className="alert";}
+function showView(id){["pinView","authView","toolView"].forEach(v=>document.getElementById(v).classList.toggle("hidden",v!==id));}
+function toE164(raw){let d=raw.replace(/\D/g,"");if(raw.trim().startsWith("+"))return "+"+d;
+  if(d.length===10)return "+1"+d;if(d.length===11&&d[0]==="1")return "+"+d;return null;}
+
+/* PIN gate */
+function checkPin(){
+  if(document.getElementById("pin").value===String(window.LOKMA.STAFF_PIN)){
+    hide("pinAlert");
+    if(!ready())return;
+    auth.onAuthStateChanged(u=>{
+      if(u&&u.phoneNumber){ document.getElementById("whoami").textContent=u.phoneNumber; showView("toolView"); }
+      else { showView("authView"); }
+    });
+  } else { show("pinAlert","err","Wrong PIN."); }
+}
+
+/* staff device sign-in */
+function staffSendCode(){
+  hide("authAlert");
+  const e164=toE164(document.getElementById("sphone").value.trim());
+  if(!e164){ show("authAlert","err","Enter a valid mobile number."); return; }
+  if(!recaptcha) recaptcha=new firebase.auth.RecaptchaVerifier('recaptcha-container',{size:'invisible'});
+  const btn=document.getElementById("sphoneBtn"); btn.disabled=true;
+  auth.signInWithPhoneNumber(e164,recaptcha)
+    .then(r=>{confirmationResult=r;btn.disabled=false;
+      document.getElementById("authPhoneStep").classList.add("hidden");
+      document.getElementById("authOtpStep").classList.remove("hidden");
+      document.getElementById("sotp").focus();})
+    .catch(e=>{console.error(e);btn.disabled=false;show("authAlert","err","Couldn't send code. Try again.");
+      try{recaptcha.clear();}catch(x){} recaptcha=null;});
+}
+function staffVerify(){
+  hide("authAlert");
+  confirmationResult.confirm(document.getElementById("sotp").value.trim())
+    .then(u=>{ document.getElementById("whoami").textContent=u.user.phoneNumber; showView("toolView"); })
+    .catch(e=>{console.error(e);show("authAlert","err","That code didn't match.");});
+}
+function signOut(){ auth.signOut().then(()=>{document.getElementById("whoami").textContent="";showView("pinView");
+  document.getElementById("pin").value="";}); }
+
+/* lookup */
+function findMember(){
+  hide("toolAlert");
+  document.getElementById("memberPanel").classList.add("hidden");
+  const e164=toE164(document.getElementById("lookup").value.trim());
+  if(!e164){ show("toolAlert","err","Enter a valid mobile number."); return; }
+  db.collection("members").doc(e164).get().then(snap=>{
+    if(!snap.exists){ show("toolAlert","err","No card on that number yet — have them sign up at the QR."); return; }
+    current=snap.data(); current._id=e164; renderMember();
+    document.getElementById("memberPanel").classList.remove("hidden");
+  }).catch(e=>{console.error(e);show("toolAlert","err","Lookup failed. Are you signed in as staff?");});
+}
+function renderMember(){
+  document.getElementById("mName").textContent=current.firstName||"—";
+  document.getElementById("mPhone").textContent=current._id;
+  const sc=document.getElementById("mScoop");
+  if(current.freeScoopRedeemed){ sc.className="scoopflag used"; sc.textContent="Signup scoop already used"; }
+  else { sc.className="scoopflag ready"; sc.textContent="🍦 Owes a free signup scoop"; }
+  document.getElementById("scoopBtn").disabled=!!current.freeScoopRedeemed;
+  const box=document.getElementById("mStamps"); box.innerHTML="";
+  const s=current.stamps||0;
+  for(let i=0;i<TOTAL;i++){const d=document.createElement("div");d.className="stamp "+(i<s?"full":"empty");
+    if(i<s)d.textContent="🍩";box.appendChild(d);}
+  document.getElementById("mCount").innerHTML="<b>"+s+"</b> / "+TOTAL+" stamps";
+  const full=s>=TOTAL;
+  document.getElementById("readyBanner").classList.toggle("show",full);
+  document.getElementById("redeemBtn").disabled=!full;
+  document.getElementById("addBtn").disabled=full;
+}
+function patch(data,okMsg){
+  data.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+  return db.collection("members").doc(current._id).update(data)
+    .then(()=>{Object.assign(current,data);renderMember();show("toolAlert","ok",okMsg);})
+    .catch(e=>{console.error(e);show("toolAlert","err","Update failed — check staff access.");});
+}
+function addStamp(){
+  const s=(current.stamps||0); if(s>=TOTAL)return;
+  patch({stamps:s+1,totalEarned:(current.totalEarned||0)+1}, "Stamp added ✓");
+}
+function redeemOrder(){
+  if((current.stamps||0)<TOTAL)return;
+  patch({stamps:0}, "Free order redeemed — card reset 🎉");
+}
+function redeemScoop(){
+  if(current.freeScoopRedeemed)return;
+  patch({freeScoopRedeemed:true}, "Signup scoop marked as used 🍦");
+}
+document.getElementById("pin").addEventListener("keydown",e=>{if(e.key==="Enter")checkPin();});
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn()    { return request.auth != null; }
+    function myPhone()     { return request.auth.token.phone_number; }
+    function isOwner(p)    { return signedIn() && myPhone() == p; }
+
+    // get() inside rules bypasses the document's own read rules, so the
+    // staff allowlist stays private while still being checkable here.
+    function isStaff() {
+      return signedIn()
+        && myPhone() in get(/databases/$(database)/documents/config/staff).data.phones;
+    }
+
+    match /members/{phone} {
+      allow read: if isOwner(phone) || isStaff();
+
+      // A new member may only create their OWN doc, with exactly the
+      // head-start stamps and no free order pre-redeemed. No self-inflating.
+      allow create: if isOwner(phone)
+        && request.resource.data.stamps == 2
+        && request.resource.data.freeScoopRedeemed == false;
+
+      // Only staff can change stamps / redemptions afterward.
+      allow update: if isStaff();
+
+      allow delete: if false;
+    }
+
+    // Staff allowlist + any config: managed only in the Firebase console.
+    // Client read/write is denied, but isStaff()'s get() above still works.
+    match /config/{doc} {
+      allow read, write: if false;
+    }
+  }
+}

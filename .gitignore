@@ -1,0 +1,20 @@
+# Firebase
+.firebase/
+*-debug.log
+firebase-debug.log
+firestore-debug.log
+.firebaserc
+
+# Dependencies / build
+node_modules/
+dist/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Secrets — keep real keys out of git if you ever split them out
+# (firebase-config.js web keys are safe to commit; they are public by design,
+#  and Firestore rules are what actually secure your data.)

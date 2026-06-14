@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Lokma · Free ice cream when you join</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --coral:#FF6A52; --coral-deep:#E8472F; --cocoa:#3A2418; --cocoa-soft:#6B4B38;
+    --sunny:#FFC542; --cream:#FFF6EC; --cream-2:#FFEEDD; --pistachio:#9CCB6B;
+    --french:#0B4FA8; --french-red:#E8413A;
+    --white:#fff; --line:#F0D9C4; --radius:22px; --shadow:0 18px 40px -18px rgba(58,36,24,.35);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    font-family:'Nunito',system-ui,sans-serif;color:var(--cocoa);background-color:var(--cream);
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(255,106,82,.10) 0 6px, transparent 7px),
+      radial-gradient(circle at 84% 12%, rgba(255,197,66,.16) 0 5px, transparent 6px),
+      radial-gradient(circle at 22% 78%, rgba(156,203,107,.16) 0 5px, transparent 6px),
+      radial-gradient(circle at 90% 70%, rgba(255,106,82,.10) 0 6px, transparent 7px);
+    background-attachment:fixed;min-height:100vh;display:flex;align-items:center;justify-content:center;
+    padding:22px 16px 40px;-webkit-font-smoothing:antialiased;
+  }
+  .wrap{width:100%;max-width:430px;position:relative;}
+  .lang{position:absolute;top:-6px;right:0;display:flex;gap:2px;background:var(--white);
+    border:2px solid var(--line);border-radius:999px;padding:3px;box-shadow:var(--shadow);z-index:5;}
+  .lang button{border:none;background:transparent;cursor:pointer;font-family:'Nunito';font-weight:800;
+    font-size:12px;color:var(--cocoa-soft);padding:6px 12px;border-radius:999px;letter-spacing:.04em;}
+  .lang button.on{background:var(--coral);color:#fff;}
+  .card{background:var(--white);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;
+    border:2px solid var(--line);margin-top:34px;}
+  .hero{background:linear-gradient(160deg,var(--coral) 0%, var(--coral-deep) 100%);color:#fff;
+    text-align:center;padding:30px 24px 64px;position:relative;overflow:hidden;}
+  .hero .eyebrow{font-weight:800;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:.92;margin:0 0 14px;}
+  .scoop{font-size:46px;line-height:1;display:inline-block;filter:drop-shadow(0 6px 8px rgba(0,0,0,.18));}
+  .scoop.bob{animation:bob 3.2s ease-in-out infinite;}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-7px) rotate(3deg)}}
+  .hero h1{font-family:'Baloo 2';font-weight:800;font-size:31px;line-height:1.05;margin:12px 0 8px;letter-spacing:-.01em;}
+  .hero p{font-weight:600;font-size:14px;line-height:1.45;margin:0 auto;max-width:320px;opacity:.96;}
+  .wave{position:absolute;left:0;right:0;bottom:-1px;height:34px;background:var(--white);
+    -webkit-mask:radial-gradient(22px at 22px 34px,transparent 98%,#000) repeat-x;
+    mask:radial-gradient(22px at 22px 34px,transparent 98%,#000) repeat-x;
+    -webkit-mask-size:44px 44px;mask-size:44px 44px;}
+  .body{padding:22px 22px 24px;}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-weight:800;font-size:12.5px;margin:0 0 5px 3px;}
+  .field label .opt{color:var(--cocoa-soft);font-weight:700;font-size:11px;}
+  .field input{width:100%;font-family:'Nunito';font-weight:600;font-size:16px;color:var(--cocoa);
+    background:var(--cream);border:2px solid var(--line);border-radius:14px;padding:13px 14px;outline:none;
+    transition:border-color .15s, box-shadow .15s, background .15s;}
+  .field input::placeholder{color:#C9B19E;font-weight:600;}
+  .field input:focus{border-color:var(--coral);background:#fff;box-shadow:0 0 0 4px rgba(255,106,82,.16);}
+  .field input.err{border-color:var(--coral-deep);background:#FFF2EF;}
+  .errmsg{color:var(--coral-deep);font-weight:700;font-size:11.5px;margin:4px 0 0 3px;display:none;}
+  .errmsg.show{display:block;}
+  .consent{display:flex;gap:11px;align-items:flex-start;background:var(--cream-2);border:2px dashed var(--line);
+    border-radius:16px;padding:13px 14px;margin:6px 0 16px;cursor:pointer;}
+  .consent input{appearance:none;-webkit-appearance:none;margin:0;flex:0 0 auto;width:24px;height:24px;
+    border:2.5px solid var(--coral);border-radius:7px;background:#fff;cursor:pointer;position:relative;margin-top:1px;}
+  .consent input:checked{background:var(--coral);}
+  .consent input:checked::after{content:"✓";position:absolute;inset:0;color:#fff;font-weight:900;font-size:15px;
+    display:flex;align-items:center;justify-content:center;}
+  .consent span{font-weight:600;font-size:12.5px;line-height:1.4;color:var(--cocoa-soft);}
+  .cta{width:100%;border:none;cursor:pointer;font-family:'Baloo 2';font-weight:800;font-size:18px;color:#fff;
+    background:var(--cocoa);border-radius:16px;padding:16px;box-shadow:0 10px 22px -10px rgba(58,36,24,.7);
+    transition:transform .12s, background .15s;}
+  .cta:hover{transform:translateY(-2px);background:#2a1810;}
+  .cta:disabled{opacity:.55;cursor:default;transform:none;}
+  .finep{text-align:center;font-weight:700;font-size:11px;color:var(--cocoa-soft);margin:13px 6px 0;line-height:1.4;}
+  .link{background:none;border:none;color:var(--coral-deep);font-family:'Nunito';font-weight:800;font-size:12.5px;
+    cursor:pointer;text-decoration:underline;padding:0;}
+  .alert{display:none;background:#FFF2EF;border:2px solid #F6C3B8;color:var(--coral-deep);border-radius:12px;
+    padding:10px 12px;font-weight:700;font-size:12.5px;margin-bottom:13px;}
+  .alert.show{display:block;}
+  .otpbig{width:100%;text-align:center;letter-spacing:.5em;font-size:26px !important;font-weight:800 !important;padding:15px !important;}
+  .strip{background:var(--cream-2);border-top:2px solid var(--line);padding:11px 18px;text-align:center;
+    font-weight:800;font-size:11.5px;color:var(--cocoa-soft);}
+  .strip b{color:var(--coral-deep);}
+  /* card */
+  .ctitle{font-family:'Baloo 2';font-weight:800;font-size:26px;text-align:center;margin:4px 0 4px;}
+  .clead{font-weight:700;font-size:13.5px;color:var(--cocoa-soft);text-align:center;margin:0 auto 16px;max-width:300px;line-height:1.4;}
+  .scoopflag{background:var(--sunny);color:#5a3d00;border-radius:14px;padding:11px;text-align:center;
+    font-family:'Baloo 2';font-weight:800;font-size:14px;margin-bottom:14px;}
+  .scoopflag.used{background:#EFE4D6;color:#8a6f57;}
+  .ticket{background:linear-gradient(160deg,#fff,#FFF8F0);border:2px solid var(--line);border-radius:18px;padding:18px 16px 16px;}
+  .tt{font-family:'Baloo 2';font-weight:700;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral-deep);margin:0 0 3px;text-align:center;}
+  .cname{font-family:'Baloo 2';font-weight:800;font-size:20px;margin:0 0 14px;text-align:center;}
+  .stamps{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:0 0 14px;}
+  .stamp{aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;}
+  .stamp.empty{border:2.5px dashed #E6C7AD;background:#FFFCF8;}
+  .stamp.full{background:radial-gradient(circle at 35% 30%, #E89B4D, #B86A2A 78%);
+    box-shadow:inset 0 -3px 6px rgba(0,0,0,.18), 0 4px 8px -3px rgba(184,106,42,.5);color:#fff;border:2.5px solid #A85C24;}
+  .stamp.head::after{content:"★";position:absolute;top:-7px;right:-5px;font-size:14px;color:var(--sunny);filter:drop-shadow(0 1px 1px rgba(0,0,0,.25));}
+  .prog{height:9px;background:#F0DFCD;border-radius:99px;overflow:hidden;margin:2px 0 8px;}
+  .prog i{display:block;height:100%;background:linear-gradient(90deg,var(--sunny),var(--coral));border-radius:99px;transition:width .5s;}
+  .remain{font-weight:800;font-size:13px;color:var(--cocoa);margin:0;text-align:center;}
+  .remain b{color:var(--coral-deep);}
+  .reward{display:none;background:var(--pistachio);color:#1f3d0e;border-radius:14px;padding:12px;text-align:center;
+    font-family:'Baloo 2';font-weight:800;font-size:15px;margin-top:10px;line-height:1.25;}
+  .reward.show{display:block;}
+  /* carousel */
+  .menu{margin-top:18px;}
+  .menu .mh{display:flex;align-items:baseline;justify-content:space-between;margin:0 2px 9px;}
+  .menu .mh h3{font-family:'Baloo 2';font-weight:800;font-size:15px;margin:0;}
+  .menu .mh a{font-weight:800;font-size:12px;color:var(--coral-deep);text-decoration:none;}
+  .carousel{position:relative;overflow:hidden;border-radius:16px;border:2px solid var(--line);}
+  .track{display:flex;transition:transform .45s cubic-bezier(.3,1,.4,1);}
+  .slide{min-width:100%;}
+  .slide .pic{height:138px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;
+    background:linear-gradient(150deg,var(--cream-2),#FFE0C8);}
+  .slide .pic img{width:100%;height:100%;object-fit:cover;}
+  .slide .pic .emoji{font-size:60px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.2));animation:tilt 4s ease-in-out infinite;}
+  @keyframes tilt{0%,100%{transform:rotate(-4deg) scale(1)}50%{transform:rotate(4deg) scale(1.06)}}
+  .slide .pic .shine{position:absolute;top:0;left:-60%;width:50%;height:100%;
+    background:linear-gradient(100deg,transparent,rgba(255,255,255,.6),transparent);animation:shine 3.4s ease-in-out infinite;}
+  @keyframes shine{0%{left:-60%}55%,100%{left:130%}}
+  .slide .meta{padding:11px 13px;background:#fff;}
+  .chip{display:inline-block;font-weight:800;font-size:9.5px;letter-spacing:.07em;text-transform:uppercase;
+    padding:3px 8px;border-radius:99px;color:#fff;margin-bottom:3px;}
+  .chip.lokma{background:var(--coral);} .chip.french{background:var(--french);}
+  .slide .meta h4{font-family:'Baloo 2';font-weight:700;font-size:15px;margin:0;}
+  .slide .meta p{font-weight:600;font-size:12px;color:var(--cocoa-soft);margin:2px 0 0;line-height:1.35;}
+  .dots{display:flex;gap:6px;justify-content:center;margin:11px 0 0;}
+  .dots b{width:7px;height:7px;border-radius:99px;background:#E6C7AD;cursor:pointer;transition:all .25s;}
+  .dots b.on{background:var(--coral);width:18px;}
+  .note{font-weight:700;font-size:10.5px;color:#B59A85;margin:14px 6px 0;line-height:1.35;text-align:center;}
+  .sprinkle{position:fixed;top:-20px;width:8px;height:16px;border-radius:4px;z-index:50;pointer-events:none;}
+  @media (max-width:380px){.hero h1{font-size:27px;}}
+  @media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="lang"><button id="enBtn" class="on" onclick="setLang('en')">EN</button><button id="frBtn" onclick="setLang('fr')">FR</button></div>
+    <div class="card">
+      <div class="hero">
+        <p class="eyebrow" id="eyebrow">Lokma · Côte-des-Neiges</p>
+        <span class="scoop bob">🍦</span>
+        <h1 id="heroH1">Free ice cream,<br>just for joining.</h1>
+        <p id="heroSub">Sign up once, grab a free scoop today, and start a card that's already two stamps in.</p>
+        <p style="font-family:'Baloo 2';font-weight:600;font-size:12px;opacity:.85;margin:9px 0 0;letter-spacing:.02em;">Tiny bites of heaven 🤍</p>
+        <div class="wave"></div>
+      </div>
+
+      <!-- STEP 1: form -->
+      <div class="body" id="formView">
+        <div class="alert" id="formAlert"></div>
+        <div class="field"><label id="lblName" for="name">First name</label>
+          <input id="name" type="text" autocomplete="given-name" placeholder="Maya" />
+          <div class="errmsg" id="errName">Add your first name</div></div>
+        <div class="field"><label id="lblEmail" for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" placeholder="maya@email.com" />
+          <div class="errmsg" id="errEmail">Check that email</div></div>
+        <div class="field"><label id="lblPhone" for="phone">Mobile <span class="opt">— we'll text a code</span></label>
+          <input id="phone" type="tel" autocomplete="tel" placeholder="514 555 0123" />
+          <div class="errmsg" id="errPhone">Check that number</div></div>
+        <div class="field"><label id="lblBday" for="bday">Birthday <span class="opt">— optional, we send a surprise</span></label>
+          <input id="bday" type="text" inputmode="numeric" placeholder="MM / DD" maxlength="7" /></div>
+        <label class="consent" for="consent"><input type="checkbox" id="consent" />
+          <span id="consentTxt">Send me Lokma deals, free-treat drops and a birthday surprise by email and text. Unsubscribe anytime.</span></label>
+        <button class="cta" id="sendBtn" onclick="sendCode()">Send my code</button>
+        <p class="finep" id="finep">One scoop per person. We never sell your info. Standard text rates may apply.</p>
+      </div>
+
+      <!-- STEP 2: OTP -->
+      <div class="body" id="otpView" style="display:none;">
+        <div class="alert" id="otpAlert"></div>
+        <p class="clead" id="otpLead">Enter the 6-digit code we texted you.</p>
+        <div class="field"><input id="otp" class="otpbig" type="text" inputmode="numeric" maxlength="6" placeholder="••••••" /></div>
+        <button class="cta" id="verifyBtn" onclick="verifyCode()">Verify & get my scoop</button>
+        <p class="finep"><button class="link" id="resendBtn" onclick="sendCode(true)">Resend code</button> · <button class="link" id="editBtn" onclick="backToForm()">Change number</button></p>
+      </div>
+
+      <!-- STEP 3: card -->
+      <div class="body" id="cardView" style="display:none;">
+        <span class="scoop" style="display:block;text-align:center;">🎉</span>
+        <h2 class="ctitle" id="cTitle">You're in!</h2>
+        <p class="clead" id="cLead">Show this screen at the counter for your free scoop.</p>
+        <div class="scoopflag" id="scoopFlag"></div>
+        <div class="ticket">
+          <p class="tt" id="cardTT">Your Lokma card</p>
+          <p class="cname" id="cardName"></p>
+          <div class="stamps" id="stamps"></div>
+          <div class="prog"><i id="progBar"></i></div>
+          <p class="remain" id="remain"></p>
+          <div class="reward" id="reward"></div>
+        </div>
+        <div class="menu">
+          <div class="mh"><h3 id="menuTitle">While you're here 👀</h3><a id="menuLink" target="_blank" rel="noopener">Full menu →</a></div>
+          <div class="carousel"><div class="track" id="track"></div></div>
+          <div class="dots" id="dots"></div>
+        </div>
+        <p class="note" id="noteTxt">Your card lives on your number. Come back any time, pop in your number, and your stamps are right here.</p>
+      </div>
+
+      <div class="strip" id="strip">Your stamps count next door at <b>La French</b> too 🍔</div>
+    </div>
+  </div>
+
+  <div id="recaptcha-container"></div>
+
+  <!-- Firebase (compat builds = no build step needed) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+<script>
+/* ---------- copy ---------- */
+const T = {
+  en:{ eyebrow:"Lokma · Côte-des-Neiges", heroH1:"Free ice cream,<br>just for joining.",
+    heroSub:"Sign up once, grab a free scoop today, and start a card that's already two stamps in.",
+    lblName:"First name", lblEmail:"Email", lblPhone:'Mobile <span class="opt">— we\'ll text a code</span>',
+    lblBday:'Birthday <span class="opt">— optional, we send a surprise</span>',
+    consentTxt:"Send me Lokma deals, free-treat drops and a birthday surprise by email. Unsubscribe anytime.",
+    send:"Send my code", finep:"One scoop per person. We only text a one-time code — no spam. We never sell your info.",
+    errName:"Add your first name", errEmail:"Check that email", errPhone:"Enter a valid mobile number",
+    otpLead:"Enter the 6-digit code we texted to {p}.", verify:"Verify & get my scoop",
+    resend:"Resend code", edit:"Change number", otpErr:"That code didn't match. Try again.",
+    sendErr:"Couldn't send the code. Check the number and try again.",
+    cTitleNew:"You're in, {n}!", cTitleBack:"Welcome back, {n}!",
+    cLead:"Show this screen at the counter for your free scoop.",
+    cLeadBack:"Here's your card. Show it at the counter to collect a stamp.",
+    scoopReady:"🍦 Free scoop — show this to staff", scoopUsed:"Free scoop already redeemed — see you next visit!",
+    cardTT:"Your Lokma card", remain:"You're already <b>2 stamps in</b> ⭐ Collect the rest on your visits — a few more and your next order's on us.",
+    reward:"Free order ready! Show this at the counter 🎉", menuTitle:"While you're here 👀", menuLink:"Full menu →",
+    note:"Your card lives on your number. Come back any time, pop in your number, and your stamps are right here.",
+    strip:'Your stamps count next door at <b>La French</b> too 🍔', namePH:"Maya" },
+  fr:{ eyebrow:"Lokma · Côte-des-Neiges", heroH1:"Crème glacée gratuite,<br>juste pour t'inscrire.",
+    heroSub:"Inscris-toi une fois, prends un cornet gratuit aujourd'hui, et pars avec une carte déjà rendue à 2 timbres.",
+    lblName:"Prénom", lblEmail:"Courriel", lblPhone:'Cellulaire <span class="opt">— on t\'envoie un code</span>',
+    lblBday:'Anniversaire <span class="opt">— optionnel, on t\'envoie une surprise</span>',
+    consentTxt:"Envoyez-moi les deals Lokma, les gâteries gratuites et une surprise d'anniversaire par courriel. Désabonnement en tout temps.",
+    send:"Envoyer mon code", finep:"Un cornet par personne. On envoie seulement un code à usage unique — pas de spam. On ne vend jamais tes infos.",
+    errName:"Ajoute ton prénom", errEmail:"Vérifie le courriel", errPhone:"Entre un numéro de cellulaire valide",
+    otpLead:"Entre le code à 6 chiffres envoyé au {p}.", verify:"Vérifier & avoir mon cornet",
+    resend:"Renvoyer le code", edit:"Changer le numéro", otpErr:"Ce code ne correspond pas. Réessaie.",
+    sendErr:"Impossible d'envoyer le code. Vérifie le numéro et réessaie.",
+    cTitleNew:"C'est fait, {n}!", cTitleBack:"Te revoilà, {n}!",
+    cLead:"Montre cet écran au comptoir pour ton cornet gratuit.",
+    cLeadBack:"Voici ta carte. Montre-la au comptoir pour avoir un timbre.",
+    scoopReady:"🍦 Cornet gratuit — montre ça au comptoir", scoopUsed:"Cornet gratuit déjà utilisé — à la prochaine!",
+    cardTT:"Ta carte Lokma", remain:"On t'a parti avec 2 timbres. <b>Encore {r}</b> et ta prochaine commande est sur nous.",
+    reward:"Commande gratuite prête! Montre ça au comptoir 🎉", menuTitle:"Tant qu'à être là 👀", menuLink:"Menu complet →",
+    note:"Ta carte est liée à ton numéro. Reviens quand tu veux, entre ton numéro, et tes timbres sont là.",
+    strip:'Tes timbres comptent aussi à côté chez <b>La French</b> 🍔', namePH:"Maya" }
+};
+const MENU = [
+  /* 👉 paste a photo/GIF URL into img to replace the emoji card */
+  { chip:"french", emoji:"🍔", img:"", en:{n:"Smash burger",d:"From 🇫🇷 to #514 — halal smash next door at La French. Stamps count there too."}, fr:{n:"Smash burger",d:"From 🇫🇷 to #514 — le smash halal juste à côté chez La French. Tes timbres comptent là aussi."} },
+  { chip:"lokma", emoji:"🍩", img:"", en:{n:"Crunchy Pistachio",d:"Pistachio spread, white chocolate, real pistachios."}, fr:{n:"Crunchy Pistachio",d:"Tartinade de pistache, chocolat blanc, vraies pistaches."} },
+  { chip:"lokma", emoji:"🍨", img:"", en:{n:"Loaded sundae",d:"Cash in your free scoop today — then load it up."}, fr:{n:"Sundae garni",d:"Profite de ton cornet gratuit — pis garnis-le."} },
+  { chip:"french", emoji:"🍟", img:"", en:{n:"Poutine",d:"The Combo CDN move: burger + poutine + a box of lokma."}, fr:{n:"Poutine",d:"Le move Combo CDN : burger + poutine + une boîte de lokma."} }
+];
+
+let lang="en", confirmationResult=null, recaptcha=null, pendingForm=null, member=null;
+const TOTAL=window.LOKMA.TOTAL_STAMPS, HEAD=window.LOKMA.HEAD_START;
+let db, auth;
+
+/* ---------- firebase init ---------- */
+function initFirebase(){
+  if(!window.firebaseConfig || String(window.firebaseConfig.apiKey).startsWith("PASTE")){
+    showAlert("formAlert","⚙️ Add your Firebase keys in firebase-config.js before this goes live.");
+    return false;
+  }
+  firebase.initializeApp(window.firebaseConfig);
+  auth=firebase.auth(); db=firebase.firestore();
+  recaptcha=new firebase.auth.RecaptchaVerifier('recaptcha-container',{size:'invisible'});
+  return true;
+}
+
+/* ---------- helpers ---------- */
+function showAlert(id,msg){const a=document.getElementById(id);a.textContent=msg;a.classList.add("show");}
+function hideAlert(id){document.getElementById(id).classList.remove("show");}
+function toE164(raw){
+  let d=raw.replace(/\D/g,"");
+  if(raw.trim().startsWith("+")) return "+"+d;
+  if(d.length===10) return "+1"+d;
+  if(d.length===11 && d[0]==="1") return "+"+d;
+  return null;
+}
+function bad(id,errId,cond){const f=document.getElementById(id),e=document.getElementById(errId);
+  if(cond){f.classList.add("err");e.classList.add("show");return true;}
+  f.classList.remove("err");e.classList.remove("show");return false;}
+
+/* ---------- language ---------- */
+function setLang(l){
+  lang=l;document.documentElement.lang=l;
+  document.getElementById("enBtn").classList.toggle("on",l==="en");
+  document.getElementById("frBtn").classList.toggle("on",l==="fr");
+  const t=T[l];
+  document.getElementById("eyebrow").textContent=t.eyebrow;
+  document.getElementById("heroH1").innerHTML=t.heroH1;
+  document.getElementById("heroSub").textContent=t.heroSub;
+  document.getElementById("lblName").textContent=t.lblName;
+  document.getElementById("lblEmail").textContent=t.lblEmail;
+  document.getElementById("lblPhone").innerHTML=t.lblPhone;
+  document.getElementById("lblBday").innerHTML=t.lblBday;
+  document.getElementById("consentTxt").textContent=t.consentTxt;
+  document.getElementById("sendBtn").textContent=t.send;
+  document.getElementById("finep").textContent=t.finep;
+  document.getElementById("verifyBtn").textContent=t.verify;
+  document.getElementById("resendBtn").textContent=t.resend;
+  document.getElementById("editBtn").textContent=t.edit;
+  document.getElementById("cardTT").textContent=t.cardTT;
+  document.getElementById("menuTitle").textContent=t.menuTitle;
+  document.getElementById("menuLink").textContent=t.menuLink;
+  document.getElementById("menuLink").href=window.LOKMA.ORDER_URL;
+  document.getElementById("noteTxt").textContent=t.note;
+  document.getElementById("strip").innerHTML=t.strip;
+  document.getElementById("name").placeholder=t.namePH;
+  renderMenu();
+  if(member) renderCard();
+}
+
+/* ---------- step 1: send code ---------- */
+function sendCode(isResend){
+  hideAlert("formAlert"); hideAlert("otpAlert");
+  if(!auth){ if(!initFirebase()) return; }
+  if(!isResend){
+    const name=document.getElementById("name").value.trim();
+    const email=document.getElementById("email").value.trim();
+    const phone=document.getElementById("phone").value.trim();
+    let fail=false;
+    fail=bad("name","errName",name.length<1)||fail;
+    fail=bad("email","errEmail",!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email))||fail;
+    const e164=toE164(phone);
+    fail=bad("phone","errPhone",!e164)||fail;
+    if(fail) return;
+    pendingForm={ name, email, phone:e164,
+      birthday:document.getElementById("bday").value.trim()||null,
+      consent:document.getElementById("consent").checked, locale:lang };
+  }
+  const btn=document.getElementById(isResend?"resendBtn":"sendBtn");
+  btn.disabled=true;
+  auth.signInWithPhoneNumber(pendingForm.phone, recaptcha)
+    .then(res=>{ confirmationResult=res;
+      document.getElementById("formView").style.display="none";
+      document.getElementById("otpView").style.display="block";
+      document.getElementById("otpLead").textContent=T[lang].otpLead.replace("{p}",pendingForm.phone);
+      document.getElementById("otp").focus(); btn.disabled=false; })
+    .catch(err=>{ console.error(err); btn.disabled=false;
+      showAlert("formAlert",T[lang].sendErr);
+      if(recaptcha&&recaptcha.clear){try{recaptcha.clear();}catch(e){} recaptcha=new firebase.auth.RecaptchaVerifier('recaptcha-container',{size:'invisible'});} });
+}
+function backToForm(){
+  document.getElementById("otpView").style.display="none";
+  document.getElementById("formView").style.display="block";
+}
+
+/* ---------- step 2: verify + load/create member ---------- */
+function verifyCode(){
+  hideAlert("otpAlert");
+  const code=document.getElementById("otp").value.trim();
+  if(code.length<6){showAlert("otpAlert",T[lang].otpErr);return;}
+  const btn=document.getElementById("verifyBtn"); btn.disabled=true;
+  confirmationResult.confirm(code)
+    .then(()=>loadOrCreateMember())
+    .catch(err=>{ console.error(err); btn.disabled=false; showAlert("otpAlert",T[lang].otpErr); });
+}
+function loadOrCreateMember(){
+  const ref=db.collection("members").doc(pendingForm.phone);
+  return ref.get().then(snap=>{
+    if(snap.exists){ member=snap.data(); member._new=false; return; }
+    const now=firebase.firestore.FieldValue.serverTimestamp();
+    const doc={ firstName:pendingForm.name, email:pendingForm.email, phone:pendingForm.phone,
+      birthday:pendingForm.birthday, marketingConsent:pendingForm.consent,
+      consentTimestamp:pendingForm.consent?now:null, locale:pendingForm.locale,
+      stamps:HEAD, totalEarned:HEAD, freeScoopRedeemed:false, createdAt:now, updatedAt:now };
+    return ref.set(doc).then(()=>{ member=doc; member._new=true; member.firstName=pendingForm.name; });
+  }).then(()=>{ showCard(); }).catch(err=>{
+    console.error(err); document.getElementById("verifyBtn").disabled=false;
+    showAlert("otpAlert","Something went wrong saving your card. Please try again.");
+  });
+}
+
+/* ---------- step 3: card ---------- */
+function showCard(){
+  document.getElementById("otpView").style.display="none";
+  document.getElementById("cardView").style.display="block";
+  const t=T[lang], n=member.firstName||"friend";
+  document.getElementById("cTitle").textContent=(member._new?t.cTitleNew:t.cTitleBack).replace("{n}",n);
+  document.getElementById("cLead").textContent=member._new?t.cLead:t.cLeadBack;
+  renderCard(); renderMenu(); startAuto(); sprinkle();
+}
+function renderCard(){
+  const t=T[lang];
+  document.getElementById("cardName").textContent=member.firstName||"";
+  const sf=document.getElementById("scoopFlag");
+  if(member.freeScoopRedeemed){ sf.className="scoopflag used"; sf.textContent=t.scoopUsed; }
+  else { sf.className="scoopflag"; sf.textContent=t.scoopReady; }
+  const box=document.getElementById("stamps"); box.innerHTML="";
+  const s=member.stamps||0;
+  for(let i=0;i<TOTAL;i++){
+    const d=document.createElement("div"); const full=i<s;
+    d.className="stamp "+(full?"full":"empty");
+    if(full&&i<HEAD&&!member.freeScoopRedeemed&&member._new!==false) d.className+=" head";
+    if(full) d.textContent="🍩"; box.appendChild(d);
+  }
+  document.getElementById("progBar").style.width=(s/TOTAL*100)+"%";
+  const rem=document.getElementById("remain"), rw=document.getElementById("reward");
+  const left=Math.max(0,TOTAL-s);
+  if(left<=0){ rem.style.display="none"; rw.textContent=t.reward; rw.classList.add("show"); }
+  else{ rem.style.display="block"; rem.innerHTML=t.remain.replace("{r}",left); rw.classList.remove("show"); }
+}
+
+/* ---------- carousel ---------- */
+let slide=0,autoTimer=null;
+function renderMenu(){
+  const track=document.getElementById("track"),dots=document.getElementById("dots");
+  track.innerHTML="";dots.innerHTML="";
+  MENU.forEach((m,i)=>{
+    const s=document.createElement("div"); s.className="slide";
+    const pic=m.img?`<img src="${m.img}" alt="${m[lang].n}">`:`<span class="emoji">${m.emoji}</span><span class="shine"></span>`;
+    s.innerHTML=`<div class="pic">${pic}</div><div class="meta"><span class="chip ${m.chip}">${m.chip==="french"?"La French":"Lokma"}</span><h4>${m[lang].n}</h4><p>${m[lang].d}</p></div>`;
+    track.appendChild(s);
+    const b=document.createElement("b"); if(i===slide)b.classList.add("on");
+    b.onclick=()=>{goSlide(i);restartAuto();}; dots.appendChild(b);
+  });
+  goSlide(slide);
+}
+function goSlide(i){ slide=(i+MENU.length)%MENU.length;
+  document.getElementById("track").style.transform=`translateX(-${slide*100}%)`;
+  [...document.getElementById("dots").children].forEach((d,k)=>d.classList.toggle("on",k===slide)); }
+function startAuto(){ if(window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  clearInterval(autoTimer); autoTimer=setInterval(()=>goSlide(slide+1),3600); }
+function restartAuto(){clearInterval(autoTimer);startAuto();}
+(function(){let x0=null;const c=document.getElementById("track").parentElement;
+  c.addEventListener("touchstart",e=>{x0=e.touches[0].clientX;},{passive:true});
+  c.addEventListener("touchend",e=>{if(x0===null)return;const dx=e.changedTouches[0].clientX-x0;
+    if(Math.abs(dx)>40){goSlide(slide+(dx<0?1:-1));restartAuto();}x0=null;},{passive:true});})();
+
+/* ---------- misc ---------- */
+document.getElementById("bday").addEventListener("input",e=>{
+  let v=e.target.value.replace(/\D/g,"").slice(0,4);
+  if(v.length>=3)v=v.slice(0,2)+" / "+v.slice(2); e.target.value=v;});
+function sprinkle(){ if(window.matchMedia("(prefers-reduced-motion:reduce)").matches)return;
+  const cols=["#FF6A52","#FFC542","#9CCB6B","#fff","#E8472F"];
+  for(let i=0;i<24;i++){const s=document.createElement("div");s.className="sprinkle";
+    s.style.left=Math.random()*100+"vw";s.style.background=cols[i%cols.length];
+    document.body.appendChild(s);
+    s.animate([{transform:"translateY(0) rotate(0)",opacity:1},{transform:"translateY(105vh) rotate("+(Math.random()*720)+"deg)",opacity:.9}],
+      {duration:1100+Math.random()*900,easing:"cubic-bezier(.3,.7,.5,1)"}).onfinish=()=>s.remove();}}
+
+setLang("en");
+initFirebase();
+</script>
+</body>
+</html>
